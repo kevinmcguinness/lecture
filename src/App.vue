@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <PresentationView />
+    <PresentationView pdf-url="slides.pdf" />
   </div>
 </template>
 

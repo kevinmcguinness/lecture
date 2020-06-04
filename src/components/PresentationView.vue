@@ -148,10 +148,10 @@ function checkModifiers(event, modifiers) {
 export default {
   name: 'PresentationView',
   props: {
+    pdfUrl: String
   },
   data() {
     return {
-      pdfUrl: 'slides.pdf',
       pdf: null,
       page: null,
       pageNumber: 1,
@@ -165,7 +165,6 @@ export default {
       lineWidth: 5,
       laserEnabled: false,
       
-
       keyBindings: {
         'Space': this.nextPage,
         'Enter': this.nextPage,
@@ -253,8 +252,6 @@ export default {
     },
 
     pageLoaded(page) {
-
-      //console.log('Page loaded');
       this.page = page;
       var viewport = page.getViewport({scale: this.scale});
 
@@ -269,10 +266,10 @@ export default {
         viewport: viewport
       });
 
-      renderTask.promise.then(this.onPageRendered);
+      renderTask.promise.then(this.pageRendered);
     },
 
-    onPageRendered() {
+    pageRendered() {
       this.pageRendering = false;
 
       // if a page is pending, skip drawing this one and render it
@@ -287,7 +284,6 @@ export default {
     },
 
     redraw() {
-
       // render pdf layer
       const w = this.pageCanvas.width, h = this.pageCanvas.height;
 
@@ -299,7 +295,6 @@ export default {
       } else {
         this.pageCtx.drawImage(this.pdfCanvas, 0, 0, w, h);
       }
-      
 
       // render annotations layer
       this.renderAnnotations();
@@ -380,22 +375,19 @@ export default {
     },
 
     pointerUp() {
-      if (this.drawing) {
-        this.drawing = false;
-        this.erasing = false;
-        this.redraw();
-      }
+      this.drawing = false;
+      this.erasing = false;
+      this.redraw();
     },
 
     pointerEnter() {
-      //this.drawing = false;
-      this.redraw();
+      this.drawing = false;
+      this.erasing = false;
     },
 
     pointerLeave() {
-      //console.log('pointerleave');
-      //this.drawing = false;
-      this.redraw();
+      this.drawing = false;
+      this.erasing = false;
     }
   },
 
@@ -409,8 +401,8 @@ export default {
     this.pageCanvas.removeEventListener('pointerdown', this.pointerDown, false);
     this.pageCanvas.removeEventListener('pointermove', this.pointerMove, false);
     this.pageCanvas.removeEventListener('pointerup', this.pointerUp, false);
-    //this.canvas.removeEventListener('pointerenter', this.pointerEnter);
-    //this.canvas.removeEventListener('pointerleave', this.pointerLeave);
+    this.pageCanvas.removeEventListener('pointerenter', this.pointerEnter);
+    this.pageCanvas.removeEventListener('pointerleave', this.pointerLeave);
   },
 
   mounted() {
@@ -425,12 +417,12 @@ export default {
     this.overlayCanvas = document.createElement("canvas");
     this.overlayCtx = this.overlayCanvas.getContext('2d');
     
-
+    // pointer events
     this.pageCanvas.addEventListener('pointerdown', this.pointerDown, false);
     this.pageCanvas.addEventListener('pointermove', this.pointerMove, false);
     this.pageCanvas.addEventListener('pointerup', this.pointerUp, false);
-    //this.canvas.addEventListener('pointerenter', this.pointerEnter);
-    //this.canvas.addEventListener('pointerleave', this.pointerLeave);
+    this.pageCanvas.addEventListener('pointerenter', this.pointerEnter);
+    this.pageCanvas.addEventListener('pointerleave', this.pointerLeave);
     
     var loadingTask = pdfjs.getDocument(this.pdfUrl);
     loadingTask.promise.then(this.pdfLoaded, function(reason) {
