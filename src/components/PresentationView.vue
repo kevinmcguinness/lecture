@@ -17,7 +17,10 @@
 
 <script>
 
-/* eslint-disable no-debugger, no-console */
+/* eslint-disable no-debugger, no-console, no-unused-vars */
+
+var pdfjs = require('pdfjs-dist');
+require('pdfjs-dist/build/pdf.worker.entry')
 
 class Annotation {
   constructor(point) {
@@ -154,7 +157,7 @@ export default {
       pageNumber: 1,
       scale: 3.0,
       drawing: false,
-      annotations: {},
+      annotations: {}, 
       blackboard: false,
       strokeStyle: '#c0392b',
       lineWidth: 5,
@@ -177,11 +180,6 @@ export default {
         'KeyZ': {modifiers: ['Ctrl'], callback: this.undoAnnotation},
         'KeyY': {modifiers: ['Ctrl'], callback: this.redoAnnotation}
       }
-    }
-  },
-  computed: {
-    pdfjs() {
-      return window['pdfjs-dist/build/pdf'];
     }
   },
 
@@ -284,7 +282,7 @@ export default {
 
     clearAllAnnotations() {
       this.annotations = {};
-      for (var i = 0; i < this.pdf.numPages; i++) {
+      for (var i = 1; i <= this.pdf.numPages; i++) {
         this.annotations[i] = new PageAnnotations();
       }
     },
@@ -377,9 +375,8 @@ export default {
   },
 
   created() {
-    this.pdfjs.GlobalWorkerOptions.workerSrc = '//mozilla.github.io/pdf.js/build/pdf.worker.js';
+    pdfjs.GlobalWorkerOptions.workerSrc = "../../build/webpack/pdf.worker.bundle.js";
     window.addEventListener('keydown', this.keyDown);
-    
   },
 
   destroyed() {
@@ -410,7 +407,7 @@ export default {
     //this.canvas.addEventListener('pointerenter', this.pointerEnter);
     //this.canvas.addEventListener('pointerleave', this.pointerLeave);
     
-    var loadingTask = this.pdfjs.getDocument(this.pdfUrl);
+    var loadingTask = pdfjs.getDocument(this.pdfUrl);
     loadingTask.promise.then(this.pdfLoaded, function(reason) {
       console.log(reason);
     });
