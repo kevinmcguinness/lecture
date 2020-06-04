@@ -149,7 +149,8 @@ export default {
   name: 'PresentationView',
   props: {
     pdfUrl: String,
-    scale: {type: Number, default: 3.0}
+    scale: {type: Number, default: 3.0},
+    initialPage: {type: Number, default: 1}
   },
   data() {
     return {
@@ -189,7 +190,7 @@ export default {
     pdfLoaded(pdf) {
       this.pdf = pdf;
       this.clearAllAnnotations();
-      this.firstPage();
+      this.goToPage(this.initialPage);
     },
 
     goToPage(pageNumber) {
@@ -358,7 +359,7 @@ export default {
         var annotation = this.getPageAnnotations().start(point);
         annotation.strokeStyle = this.strokeStyle;
         annotation.lineWidth = this.lineWidth;
-      } else if (e.button == 5) {
+      } else if (e.button == 5) { // surface pro eraser
         this.drawing = false;
         this.erasing = true;
         this.getPageAnnotations().erase(point, 5);
