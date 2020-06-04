@@ -2,24 +2,30 @@
   <div class="main">
     <canvas id="pageCanvas" width="2736" height="1824" v-bind:class="{laser: laserEnabled}"></canvas>
     <div class="controls">
+      <button class="color" style="background: #fff" v-on:click="strokeStyle = '#fff'"></button>
       <button class="color" style="background: #c0392b" v-on:click="strokeStyle = '#c0392b'"></button>
       <button class="color" style="background: #2980b9" v-on:click="strokeStyle = '#2980b9'"></button>
       <button class="color" style="background: #27ae60" v-on:click="strokeStyle = '#27ae60'"></button>
       <button class="color" style="background: #e67e22" v-on:click="strokeStyle = '#e67e22'"></button>
       <button class="color" style="background: #34495e" v-on:click="strokeStyle = '#34495e'"></button>
+      <button class="circle small"  v-on:click="lineWidth = 2"></button>
+      <button class="circle medium" v-on:click="lineWidth = 5" ></button>
+      <button class="circle large"  v-on:click="lineWidth = 10"></button>
     </div>
   </div>
 </template>
 
 <script>
 
+/* eslint-disable no-debugger, no-console */
+
 class Annotation {
   constructor(point) {
     this.points = [point];
     this.path = new Path2D();
     this.path.moveTo(point.x, point.y);
-    this.strokeStyle = '#ff0000';
-    this.lineWidth = 2;
+    this.strokeStyle = '#c0392b';
+    this.lineWidth = 5;
     this.lineCap = 'round';
     this.lineJoin = 'round';
   }
@@ -54,13 +60,16 @@ class Annotation {
 class PageAnnotations {
   constructor() {
     this.annotations = [];
+    this.redoStack = [];
   }
 
   clear() {
     this.annotations = [];
+    this.redoStack = [];
   }
 
   start(point) {
+    this.redoStack = [];
     var annotation = new Annotation(point);
     this.annotations.push(annotation);
     return annotation;
@@ -68,6 +77,24 @@ class PageAnnotations {
 
   update(point) {
     this.top().lineTo(point);
+  }
+
+  undo() {
+    var items = this.annotations.splice(this.annotations.length - 1, 1);
+    if (items.length > 0) {
+      this.redoStack.push(items[0]);
+      return true;
+    }
+    return false;
+  }
+
+  redo() {
+    var items = this.redoStack.splice(this.redoStack.length - 1, 1);
+    if (items.length > 0) {
+      this.annotations.push(items[0]);
+      return true;
+    }
+    return false;
   }
 
   erase(point, radius) {
@@ -85,6 +112,35 @@ class PageAnnotations {
   }
 }
 
+function checkModifiers(event, modifiers) {
+  for (const modifier of modifiers) {
+    switch (modifier) {
+      case 'Ctrl':
+      case 'Control':
+        if (!event.ctrlKey) {
+          return false;
+        }
+        break;
+      case 'Alt':
+        if (!event.altKey) {
+          return false;
+        }
+        break;
+      case 'Shift':
+        if (!event.shiftKey) {
+          return false;
+        }
+        break;
+      case 'Meta':
+        if (!event.metaKey) {
+          return false;
+        }
+        break;
+    }
+  }
+  return true;
+}
+
 
 export default {
   name: 'PresentationView',
@@ -100,8 +156,8 @@ export default {
       drawing: false,
       annotations: {},
       blackboard: false,
-      strokeStyle: '#00ff00',
-      lineWidth: 2,
+      strokeStyle: '#c0392b',
+      lineWidth: 5,
       laserEnabled: false,
 
       keyBindings: {
@@ -117,7 +173,9 @@ export default {
         'PageUp': this.previousPage,
         'KeyE': this.clearPageAnnotations,
         'KeyB': this.toggleBlackboard,
-        'KeyL': this.toggleLaserPointer
+        'KeyL': this.toggleLaserPointer,
+        'KeyZ': {modifiers: ['Ctrl'], callback: this.undoAnnotation},
+        'KeyY': {modifiers: ['Ctrl'], callback: this.redoAnnotation}
       }
     }
   },
@@ -129,7 +187,6 @@ export default {
 
   methods: {
     pdfLoaded(pdf) {
-      //console.log('PDF loaded');
       this.pdf = pdf;
       this.clearAllAnnotations();
       this.firstPage();
@@ -143,9 +200,19 @@ export default {
     },
 
     toggleLaserPointer() {
-      
       this.laserEnabled = !this.laserEnabled;
-      console.log("laserEnabled", this.laserEnabled);
+    },
+
+    undoAnnotation() {
+      if (this.getPageAnnotations().undo()) {
+        this.redraw();
+      }
+    },
+
+    redoAnnotation() {
+      if (this.getPageAnnotations().redo()) {
+        this.redraw();
+      }
     },
 
     nextPage() {
@@ -249,11 +316,17 @@ export default {
     },
 
     keyDown(e) {
-      //console.log(e.code);
       if (e.code in this.keyBindings) {
-        let method = this.keyBindings[e.code];
-        method();
-        e.preventDefault();
+        let handler = this.keyBindings[e.code];
+        if (typeof(handler) === "function") {
+          handler();
+          e.preventDefault();
+        } else if (typeof(handler) == "object") {
+          if (checkModifiers(event, handler.modifiers)) {
+            handler.callback();
+            e.preventDefault();
+          }
+        }
       }
     },
 
@@ -373,18 +446,51 @@ canvas {
 div.controls {
   position: absolute;
   bottom: 10px;
-  left: 10px;
-  width: 300px;
+  right: 10px;
+  padding: 0px 5px;
   height: 30px;
   background: rgba(0, 0, 0, 0.25);
-  border: 1px solid gray;
+  /* border: 1px solid gray; */
+  line-height: 30px;
+  vertical-align: center;
+  display: flex;
+  align-items: center;
 }
 
 button.color {
+  display: inline-block;
   padding: 0;
-  margin: 5px;
+  margin: 5px 3px;
   border: 2px solid black;
   width: 20px;
   height: 20px;
+}
+
+button.circle {
+  display: inline-block;
+  padding: 0;
+  margin: 5px 3px;
+  border: 2px solid black;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #eee;
+}
+
+button.circle.large {
+  width: 20px;
+  height: 20px;
+}
+
+button.circle.medium {
+  width: 15px;
+  height: 15px;
+  margin: 0 5px 0 5px;
+}
+
+button.circle.small {
+  width: 10px;
+  height: 10px;
+  margin: 0px 5px 0px 15px;
 }
 </style>
