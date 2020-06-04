@@ -148,7 +148,8 @@ function checkModifiers(event, modifiers) {
 export default {
   name: 'PresentationView',
   props: {
-    pdfUrl: String
+    pdfUrl: String,
+    scale: {type: Number, default: 3.0}
   },
   data() {
     return {
@@ -157,7 +158,6 @@ export default {
       pageNumber: 1,
       pageNumberPending: null,
       pageRendering: false,
-      scale: 3.0,
       drawing: false,
       annotations: {}, 
       blackboard: false,
@@ -243,12 +243,16 @@ export default {
     },
 
     adjustSize(viewport) {
-      this.pageCanvas.height = viewport.height;
-      this.pageCanvas.width = viewport.width;
-      this.pdfCanvas.height = viewport.height;
-      this.pdfCanvas.width = viewport.width;
-      this.overlayCanvas.height = viewport.height;
-      this.overlayCanvas.width = viewport.width;
+      if (this.pageCanvas.height != viewport.height || 
+          this.pageCanvas.width != viewport.width
+      ) {
+        this.pageCanvas.height = viewport.height;
+        this.pageCanvas.width = viewport.width;
+        this.pdfCanvas.height = viewport.height;
+        this.pdfCanvas.width = viewport.width;
+        this.overlayCanvas.height = viewport.height;
+        this.overlayCanvas.width = viewport.width;
+      }
     },
 
     pageLoaded(page) {
@@ -256,9 +260,7 @@ export default {
       var viewport = page.getViewport({scale: this.scale});
 
       // Prepare canvas using PDF page dimensions
-      if (this.pageNumber == 1) {
-        this.adjustSize(viewport);
-      }
+      this.adjustSize(viewport);
       
       // Render PDF page into canvas context
       var renderTask = page.render({
