@@ -155,6 +155,8 @@ export default {
       pdf: null,
       page: null,
       pageNumber: 1,
+      pageNumberPending: null,
+      pageRendering: false,
       scale: 3.0,
       drawing: false,
       annotations: {}, 
@@ -162,6 +164,7 @@ export default {
       strokeStyle: '#c0392b',
       lineWidth: 5,
       laserEnabled: false,
+      
 
       keyBindings: {
         'Space': this.nextPage,
@@ -192,8 +195,14 @@ export default {
 
     goToPage(pageNumber) {
       if (pageNumber >= 1 && pageNumber <= this.pdf.numPages) {
-        this.pageNumber = pageNumber;
-        this.pdf.getPage(this.pageNumber).then(this.pageLoaded);
+        if (this.pageRendering) {
+          this.pageNumberPending = pageNumber;
+        } else {
+          
+          this.pageRendering = true;
+          this.pageNumber = pageNumber;
+          this.pdf.getPage(this.pageNumber).then(this.pageLoaded);
+        }
       }
     },
 
@@ -244,6 +253,7 @@ export default {
     },
 
     pageLoaded(page) {
+
       //console.log('Page loaded');
       this.page = page;
       var viewport = page.getViewport({scale: this.scale});
@@ -259,10 +269,25 @@ export default {
         viewport: viewport
       });
 
-      renderTask.promise.then(this.redraw);
+      renderTask.promise.then(this.onPageRendered);
+    },
+
+    onPageRendered() {
+      this.pageRendering = false;
+
+      // if a page is pending, skip drawing this one and render it
+      if (this.pageNumberPending !== null) {
+        this.goToPage(this.pageNumberPending);
+        this.pageNumberPending = null;
+
+      // otherwise, render page and annotations
+      } else {
+        this.redraw();
+      }
     },
 
     redraw() {
+
       // render pdf layer
       const w = this.pageCanvas.width, h = this.pageCanvas.height;
 
