@@ -18,6 +18,12 @@ npm run serve
 npm run build
 ```
 
+Test production build
+```
+npm install -g serve
+serve -s dist
+```
+
 ### Lints and fixes files
 ```
 npm run lint
