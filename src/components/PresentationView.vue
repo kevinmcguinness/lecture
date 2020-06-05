@@ -19,8 +19,9 @@
 
 /* eslint-disable no-debugger, no-console, no-unused-vars */
 
-var pdfjs = require('pdfjs-dist');
-require('pdfjs-dist/build/pdf.worker.entry')
+import pdfjs from 'pdfjs-dist'
+import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.entry';
+pdfjs.GlobalWorkerOptions.workerSrc = pdfjsWorker;
 
 class Annotation {
   constructor(point) {
@@ -395,7 +396,6 @@ export default {
   },
 
   created() {
-    pdfjs.GlobalWorkerOptions.workerSrc = "../../build/webpack/pdf.worker.bundle.js";
     window.addEventListener('keydown', this.keyDown);
   },
 
