@@ -19,7 +19,7 @@
 
 /* eslint-disable no-debugger, no-console, no-unused-vars */
 
-import pdfjs from 'pdfjs-dist'
+import pdfjs from 'pdfjs-dist';
 import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.entry';
 pdfjs.GlobalWorkerOptions.workerSrc = pdfjsWorker;
 
