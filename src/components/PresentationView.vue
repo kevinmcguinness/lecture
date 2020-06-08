@@ -23,6 +23,7 @@ import pdfjs from 'pdfjs-dist';
 import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.entry';
 pdfjs.GlobalWorkerOptions.workerSrc = pdfjsWorker;
 
+
 class Annotation {
   constructor(point) {
     this.points = [point];
@@ -60,6 +61,7 @@ class Annotation {
     return false;
   }
 }
+
 
 class PageAnnotations {
   constructor() {
@@ -115,6 +117,7 @@ class PageAnnotations {
     return this.annotations[this.annotations.length - 1];
   }
 }
+
 
 function checkModifiers(event, modifiers) {
   for (const modifier of modifiers) {
@@ -187,7 +190,20 @@ export default {
     }
   },
 
+  watch: {
+    pdfUrl(newUrl) {
+      this.loadPdf();
+    }
+  },
+
   methods: {
+    loadPdf() {
+      var loadingTask = pdfjs.getDocument(this.pdfUrl);
+      loadingTask.promise.then(this.pdfLoaded, function(reason) {
+        console.log(reason);
+      });
+    },
+
     pdfLoaded(pdf) {
       this.pdf = pdf;
       this.clearAllAnnotations();
@@ -427,12 +443,10 @@ export default {
     this.pageCanvas.addEventListener('pointerenter', this.pointerEnter);
     this.pageCanvas.addEventListener('pointerleave', this.pointerLeave);
     
-    var loadingTask = pdfjs.getDocument(this.pdfUrl);
-    loadingTask.promise.then(this.pdfLoaded, function(reason) {
-      console.log(reason);
-    });
+    this.loadPdf();
   }
 }
+
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
