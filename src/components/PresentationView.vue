@@ -1,5 +1,5 @@
 <template>
-  <div class="main">
+  <div class="main" id="container">
     <canvas id="pageCanvas" width="2736" height="1824" v-bind:class="{laser: laserEnabled}"></canvas>
     <div class="controls">
       <button class="color" style="background: #fff" v-on:click="strokeStyle = '#fff'"></button>
@@ -185,7 +185,8 @@ export default {
         'KeyB': this.toggleBlackboard,
         'KeyL': this.toggleLaserPointer,
         'KeyZ': {modifiers: ['Ctrl'], callback: this.undoAnnotation},
-        'KeyY': {modifiers: ['Ctrl'], callback: this.redoAnnotation}
+        'KeyY': {modifiers: ['Ctrl'], callback: this.redoAnnotation},
+        'KeyF': this.fullScreen,
       }
     }
   },
@@ -225,6 +226,11 @@ export default {
 
     toggleLaserPointer() {
       this.laserEnabled = !this.laserEnabled;
+    },
+
+    fullScreen() {
+      const elem = document.getElementById('pageCanvas');
+      elem.requestFullscreen();
     },
 
     undoAnnotation() {
