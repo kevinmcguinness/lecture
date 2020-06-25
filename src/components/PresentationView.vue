@@ -1,5 +1,5 @@
 <template>
-  <div class="main" id="container">
+  <div class="main" id="presentation">
     <canvas id="pageCanvas" width="2736" height="1824" v-bind:class="{laser: laserEnabled, pen: penEnabled}"></canvas>
     <div class="controls">
       <button class="color" style="background: #fff" v-on:click="setPenColor('#fff')"></button>
@@ -12,6 +12,7 @@
       <button class="circle medium" v-on:click="setPenSize(5)" ></button>
       <button class="circle large"  v-on:click="setPenSize(10)"></button>
     </div>
+    <ShortcutsView v-bind:visible="helpVisible" />
   </div>
 </template>
 
@@ -21,6 +22,7 @@
 
 import pdfjs from 'pdfjs-dist';
 import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.entry';
+import ShortcutsView from './ShortcutsView.vue';
 pdfjs.GlobalWorkerOptions.workerSrc = pdfjsWorker;
 
 
@@ -151,6 +153,9 @@ function checkModifiers(event, modifiers) {
 
 export default {
   name: 'PresentationView',
+  components: {
+    ShortcutsView
+  },
   props: {
     pdfUrl: String,
     scale: {type: Number, default: 3.0},
@@ -170,6 +175,7 @@ export default {
       lineWidth: 5,
       laserEnabled: false,
       penEnabled: true,
+      helpVisible: false,
       
       keyBindings: {
         'Space': this.nextPage,
@@ -189,6 +195,7 @@ export default {
         'KeyZ': {modifiers: ['Ctrl'], callback: this.undoAnnotation},
         'KeyY': {modifiers: ['Ctrl'], callback: this.redoAnnotation},
         'KeyF': this.fullScreen,
+        'KeyH': this.toggleHelpVisible
       }
     }
   },
@@ -226,6 +233,10 @@ export default {
       }
     },
 
+    toggleHelpVisible() {
+      this.helpVisible = !this.helpVisible;
+    },
+
     toggleLaserPointer() {
       this.laserEnabled = !this.laserEnabled;
       if (this.laserEnabled) {
@@ -255,7 +266,7 @@ export default {
     },
 
     fullScreen() {
-      const elem = document.getElementById('pageCanvas');
+      const elem = document.getElementById('presentation');
       elem.requestFullscreen();
     },
 
@@ -544,6 +555,7 @@ div.controls {
   vertical-align: center;
   display: flex;
   align-items: center;
+  z-index: 100;
 } 
 
 button.color {
