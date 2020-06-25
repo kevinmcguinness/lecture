@@ -225,6 +225,7 @@ export default {
     },
 
     toggleLaserPointer() {
+      console.log('laser')
       this.laserEnabled = !this.laserEnabled;
     },
 
@@ -492,7 +493,7 @@ canvas {
 }
 
 .laser {
-  cursor: url("/laser-pointer.cur"), auto; 
+  cursor: url(/laser-pointer.png), pointer; 
 }
 
 div.controls {
@@ -502,12 +503,11 @@ div.controls {
   padding: 0px 5px;
   height: 30px;
   background: rgba(0, 0, 0, 0.25);
-  /* border: 1px solid gray; */
   line-height: 30px;
   vertical-align: center;
   display: flex;
   align-items: center;
-}
+} 
 
 button.color {
   display: inline-block;
