@@ -1,16 +1,16 @@
 <template>
   <div class="main" id="container">
-    <canvas id="pageCanvas" width="2736" height="1824" v-bind:class="{laser: laserEnabled}"></canvas>
+    <canvas id="pageCanvas" width="2736" height="1824" v-bind:class="{laser: laserEnabled, pen: penEnabled}"></canvas>
     <div class="controls">
-      <button class="color" style="background: #fff" v-on:click="strokeStyle = '#fff'"></button>
-      <button class="color" style="background: #c0392b" v-on:click="strokeStyle = '#c0392b'"></button>
-      <button class="color" style="background: #2980b9" v-on:click="strokeStyle = '#2980b9'"></button>
-      <button class="color" style="background: #27ae60" v-on:click="strokeStyle = '#27ae60'"></button>
-      <button class="color" style="background: #e67e22" v-on:click="strokeStyle = '#e67e22'"></button>
-      <button class="color" style="background: #34495e" v-on:click="strokeStyle = '#34495e'"></button>
-      <button class="circle small"  v-on:click="lineWidth = 2"></button>
-      <button class="circle medium" v-on:click="lineWidth = 5" ></button>
-      <button class="circle large"  v-on:click="lineWidth = 10"></button>
+      <button class="color" style="background: #fff" v-on:click="setPenColor('#fff')"></button>
+      <button class="color" style="background: #c0392b" v-on:click="setPenColor('#c0392b')"></button>
+      <button class="color" style="background: #2980b9" v-on:click="setPenColor('#2980b9')"></button>
+      <button class="color" style="background: #27ae60" v-on:click="setPenColor('#27ae60')"></button>
+      <button class="color" style="background: #e67e22" v-on:click="setPenColor('#e67e22')"></button>
+      <button class="color" style="background: #34495e" v-on:click="setPenColor('#34495e')"></button>
+      <button class="circle small"  v-on:click="setPenSize(2)"></button>
+      <button class="circle medium" v-on:click="setPenSize(5)" ></button>
+      <button class="circle large"  v-on:click="setPenSize(10)"></button>
     </div>
   </div>
 </template>
@@ -169,6 +169,7 @@ export default {
       strokeStyle: '#c0392b',
       lineWidth: 5,
       laserEnabled: false,
+      penEnabled: true,
       
       keyBindings: {
         'Space': this.nextPage,
@@ -184,6 +185,7 @@ export default {
         'KeyE': this.clearPageAnnotations,
         'KeyB': this.toggleBlackboard,
         'KeyL': this.toggleLaserPointer,
+        'KeyP': this.togglePen,
         'KeyZ': {modifiers: ['Ctrl'], callback: this.undoAnnotation},
         'KeyY': {modifiers: ['Ctrl'], callback: this.redoAnnotation},
         'KeyF': this.fullScreen,
@@ -225,8 +227,31 @@ export default {
     },
 
     toggleLaserPointer() {
-      console.log('laser')
       this.laserEnabled = !this.laserEnabled;
+      if (this.laserEnabled) {
+        this.penEnabled = false;
+      }
+    },
+
+    togglePen() {
+      this.penEnabled = !this.penEnabled;
+      if (this.penEnabled) {
+        this.laserEnabled = false;
+      } else {
+        this.drawing = this.erasing = false;
+      }
+    },
+
+    setPenColor(color) {
+      this.strokeStyle = color;
+      this.penEnabled = true;
+      this.laserEnabled = false;
+    },
+
+    setPenSize(size) {
+      this.lineWidth = size;
+      this.penEnabled = true;
+      this.laserEnabled = false;
     },
 
     fullScreen() {
@@ -376,35 +401,43 @@ export default {
     },
 
     pointerDown(e) {
-      const point = this.getCanvasPoint(e);
-      if (e.button == 0) {
-        this.drawing = true;
-        this.erasing = false;
-        var annotation = this.getPageAnnotations().start(point);
-        annotation.strokeStyle = this.strokeStyle;
-        annotation.lineWidth = this.lineWidth;
-      } else if (e.button == 5) { // surface pro eraser
-        this.drawing = false;
-        this.erasing = true;
-        this.getPageAnnotations().erase(point, 5);
-      }
+      if (this.penEnabled) {
+        const point = this.getCanvasPoint(e);
+        if (e.button == 0) {
+          this.drawing = true;
+          this.erasing = false;
+          var annotation = this.getPageAnnotations().start(point);
+          annotation.strokeStyle = this.strokeStyle;
+          annotation.lineWidth = this.lineWidth;
+        } else if (e.button == 5) { // surface pro eraser
+          this.drawing = false;
+          this.erasing = true;
+          this.getPageAnnotations().erase(point, 5);
+        }
+      } 
     },
 
     pointerMove(e) {
-      const point = this.getCanvasPoint(e);
-      if (this.drawing) {
-        this.getPageAnnotations().update(point);
-        this.redraw();
-      } else if (this.erasing) {
-        this.getPageAnnotations().erase(point, 5);
-        this.redraw();
+      if (this.penEnabled) {
+        const point = this.getCanvasPoint(e);
+        if (this.drawing) {
+          this.getPageAnnotations().update(point);
+          this.redraw();
+        } else if (this.erasing) {
+          this.getPageAnnotations().erase(point, 5);
+          this.redraw();
+        }
       }
     },
 
     pointerUp() {
-      this.drawing = false;
-      this.erasing = false;
-      this.redraw();
+      if (this.penEnabled) {
+        this.drawing = false;
+        this.erasing = false;
+        this.redraw();
+      } else {
+        this.nextPage();
+      }
     },
 
     pointerEnter() {
@@ -493,7 +526,11 @@ canvas {
 }
 
 .laser {
-  cursor: url(/laser-pointer.png), pointer; 
+  cursor: url(/laser-pointer.png), pointer !important; 
+}
+
+.pen {
+  cursor: crosshair;
 }
 
 div.controls {
