@@ -414,6 +414,17 @@ export default {
     pointerLeave() {
       this.drawing = false;
       this.erasing = false;
+    },
+
+    mouseWheel(e) {
+      // Wheel up/down to change slide
+      if (e.deltaY >= 10) {
+        this.nextPage();
+        e.preventDefault();
+      } else if (e.deltaY <= -10) {
+        this.previousPage();
+        e.preventDefault();
+      }
     }
   },
 
@@ -428,6 +439,7 @@ export default {
     this.pageCanvas.removeEventListener('pointerup', this.pointerUp, false);
     this.pageCanvas.removeEventListener('pointerenter', this.pointerEnter);
     this.pageCanvas.removeEventListener('pointerleave', this.pointerLeave);
+    this.pageCanvas.removeEventListener('wheel', this.mouseWheel);
   },
 
   mounted() {
@@ -448,6 +460,9 @@ export default {
     this.pageCanvas.addEventListener('pointerup', this.pointerUp, false);
     this.pageCanvas.addEventListener('pointerenter', this.pointerEnter);
     this.pageCanvas.addEventListener('pointerleave', this.pointerLeave);
+
+    // mouse wheel
+    this.pageCanvas.addEventListener('wheel', this.mouseWheel);
     
     this.loadPdf();
   }
