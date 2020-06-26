@@ -2,7 +2,7 @@
   <div class="main" id="presentation">
     <canvas id="pageCanvas" width="2736" height="1824" 
       v-bind:class="{laser: laserEnabled, pen: penEnabled, erase: eraserEnabled}"></canvas>
-    <div class="controls">
+    <div class="controls" v-bind:class="{hidden: !toolboxVisible}">
       <button class="color" style="background: #fff" v-on:click="setPenColor('#fff')"></button>
       <button class="color" style="background: #c0392b" v-on:click="setPenColor('#c0392b')"></button>
       <button class="color" style="background: #2980b9" v-on:click="setPenColor('#2980b9')"></button>
@@ -179,6 +179,7 @@ export default {
       penEnabled: true,
       eraserEnabled: false,
       helpVisible: false,
+      toolboxVisible: true,
       
       keyBindings: {
         'Space': this.nextPage,
@@ -198,7 +199,8 @@ export default {
         'KeyZ': {modifiers: ['Ctrl'], callback: this.undoAnnotation},
         'KeyY': {modifiers: ['Ctrl'], callback: this.redoAnnotation},
         'KeyF': this.fullScreen,
-        'KeyH': this.toggleHelpVisible
+        'KeyH': this.toggleHelpVisible,
+        'KeyT': this.toggleToolboxVisibility
       }
     }
   },
@@ -261,6 +263,10 @@ export default {
       } else {
         this.drawing = this.erasing = false;
       }
+    },
+
+    toggleToolboxVisibility() {
+      this.toolboxVisible = !this.toolboxVisible;
     },
 
     setPenColor(color) {
@@ -562,6 +568,10 @@ canvas {
 
 .pen {
   cursor: crosshair;
+}
+
+.hidden {
+  visibility: hidden;
 }
 
 div.controls {
