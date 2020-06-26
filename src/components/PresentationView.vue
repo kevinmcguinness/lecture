@@ -3,16 +3,28 @@
     <canvas id="pageCanvas" width="2736" height="1824" 
       v-bind:class="{laser: laserEnabled, pen: penEnabled, erase: eraserEnabled}"></canvas>
     <div class="controls" v-bind:class="{hidden: !toolboxVisible}">
-      <button class="color" style="background: #fff" v-on:click="setPenColor('#fff')"></button>
-      <button class="color" style="background: #c0392b" v-on:click="setPenColor('#c0392b')"></button>
-      <button class="color" style="background: #2980b9" v-on:click="setPenColor('#2980b9')"></button>
-      <button class="color" style="background: #27ae60" v-on:click="setPenColor('#27ae60')"></button>
-      <button class="color" style="background: #e67e22" v-on:click="setPenColor('#e67e22')"></button>
-      <button class="color" style="background: #34495e" v-on:click="setPenColor('#34495e')"></button>
-      <button class="circle small"  v-on:click="setPenSize(2)"></button>
-      <button class="circle medium" v-on:click="setPenSize(5)" ></button>
-      <button class="circle large"  v-on:click="setPenSize(10)"></button>
-      <button class="eraser" v-on:click="enableEraser()"></button>
+
+      <!-- colors -->
+      <button class="color" title="white"  style="background: #ffffff" v-on:click="setPenColor('#ffffff')"></button>
+      <button class="color" title="gray"   style="background: #34495e" v-on:click="setPenColor('#34495e')"></button>
+      <button class="color" title="red"    style="background: #c0392b" v-on:click="setPenColor('#c0392b')"></button>
+      <button class="color" title="blue"   style="background: #2980b9" v-on:click="setPenColor('#2980b9')"></button>
+      <button class="color" title="green"  style="background: #27ae60" v-on:click="setPenColor('#27ae60')"></button>
+      <button class="color" title="orange" style="background: #e67e22" v-on:click="setPenColor('#e67e22')"></button>
+      <button class="color" title="purple" style="background: #8e44ad" v-on:click="setPenColor('#8e44ad')"></button>
+      <button class="color" title="yellow" style="background: #f1c40f" v-on:click="setPenColor('#f1c40f')"></button>
+     
+      <span class="separator" />
+
+      <!-- pen sizes -->
+      <button class="circle small"  title="fine pen"   v-on:click="setPenSize(2)"></button>
+      <button class="circle medium" title="medium pen" v-on:click="setPenSize(5)" ></button>
+      <button class="circle large"  title="thick pen"   v-on:click="setPenSize(10)"></button>
+
+      <span class="separator" />
+
+      <!-- eraser -->
+      <button class="eraser" title="eraser" v-on:click="enableEraser()"></button>
     </div>
     <ShortcutsView v-bind:visible="helpVisible" />
   </div>
@@ -173,7 +185,7 @@ export default {
       annotations: {}, 
       blackboard: false,
       whiteboard: false,
-      strokeStyle: '#c0392b',
+      strokeStyle: '#2980b9',
       lineWidth: 5,
       laserEnabled: false,
       penEnabled: true,
@@ -634,7 +646,7 @@ button.circle.medium {
 button.circle.small {
   width: 10px;
   height: 10px;
-  margin: 0px 5px 0px 15px;
+  margin: 0px 5px 0px 5px;
 }
 
 button.eraser {
@@ -648,5 +660,10 @@ button.eraser {
   background-size: 20px 20px;
   background-color:rgba(0, 0, 0, 0);
   background-position: center;
+}
+
+.separator {
+  display: inline-block;
+  width: 15px;
 }
 </style>
