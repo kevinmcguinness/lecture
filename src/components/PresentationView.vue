@@ -27,6 +27,7 @@
       <button class="eraser" title="eraser" v-on:click="enableEraser()"></button>
     </div>
     <ShortcutsView v-bind:visible="helpVisible" />
+    <span id="slide-number" v-bind:class="{hidden: !pageNumberVisible}">{{pageNumber}} / {{pageCount}}</span>
   </div>
 </template>
 
@@ -179,6 +180,8 @@ export default {
       pdf: null,
       page: null,
       pageNumber: 1,
+      pageCount: 1,
+      pageNumberVisible: false,
       pageNumberPending: null,
       pageRendering: false,
       drawing: false,
@@ -213,7 +216,8 @@ export default {
         'KeyY': {modifiers: ['Ctrl'], callback: this.redoAnnotation},
         'KeyF': this.fullScreen,
         'KeyH': this.toggleHelpVisible,
-        'KeyT': this.toggleToolboxVisibility
+        'KeyT': this.toggleToolboxVisibility,
+        'KeyN': this.togglePageNumberVisible
       }
     }
   },
@@ -234,6 +238,7 @@ export default {
 
     pdfLoaded(pdf) {
       this.pdf = pdf;
+      this.pageCount = pdf.numPages;
       this.clearAllAnnotations();
       this.goToPage(this.initialPage);
     },
@@ -280,6 +285,10 @@ export default {
 
     toggleToolboxVisibility() {
       this.toolboxVisible = !this.toolboxVisible;
+    },
+
+    togglePageNumberVisible() {
+      this.pageNumberVisible = !this.pageNumberVisible;
     },
 
     setPenColor(color) {
@@ -665,5 +674,13 @@ button.eraser {
 .separator {
   display: inline-block;
   width: 15px;
+}
+
+#slide-number {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  font-size: 14pt;
+  color: #bdc3c7;
 }
 </style>
