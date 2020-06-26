@@ -1,4 +1,4 @@
-# pdfshow
+# lecture
 
 Present PDF slideshows using a browser. Supports writing on slides using a pointer
 device (e.g. Surface Pro Pen). Supports Surface Pro Pen eraser.
