@@ -172,6 +172,7 @@ export default {
       drawing: false,
       annotations: {}, 
       blackboard: false,
+      whiteboard: false,
       strokeStyle: '#c0392b',
       lineWidth: 5,
       laserEnabled: false,
@@ -193,6 +194,7 @@ export default {
         'PageUp': this.previousPage,
         'KeyE': this.clearPageAnnotations,
         'KeyB': this.toggleBlackboard,
+        'KeyW': this.toggleWhiteboard,
         'KeyL': this.toggleLaserPointer,
         'KeyP': this.togglePen,
         'KeyZ': {modifiers: ['Ctrl'], callback: this.undoAnnotation},
@@ -317,6 +319,17 @@ export default {
 
     toggleBlackboard() {
       this.blackboard = !this.blackboard;
+      if (this.blackboard) {
+        this.whiteboard = false;
+      }
+      this.redraw();
+    },
+
+    toggleWhiteboard() {
+      this.whiteboard = !this.whiteboard;
+      if (this.whiteboard) {
+        this.blackboard = false;
+      }
       this.redraw();
     },
 
@@ -369,8 +382,8 @@ export default {
 
       this.pageCtx.clearRect(0, 0, w, h);
 
-      if (this.blackboard) {
-        this.pageCtx.fillStyle = '#000';
+      if (this.blackboard || this.whiteboard) {
+        this.pageCtx.fillStyle = this.blackboard ? '#000' : '#fff';
         this.pageCtx.fillRect(0, 0, w, h);
       } else {
         this.pageCtx.drawImage(this.pdfCanvas, 0, 0, w, h);
