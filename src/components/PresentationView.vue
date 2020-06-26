@@ -1,6 +1,7 @@
 <template>
   <div class="main" id="presentation">
-    <canvas id="pageCanvas" width="2736" height="1824" v-bind:class="{laser: laserEnabled, pen: penEnabled}"></canvas>
+    <canvas id="pageCanvas" width="2736" height="1824" 
+      v-bind:class="{laser: laserEnabled, pen: penEnabled, erase: eraserEnabled}"></canvas>
     <div class="controls">
       <button class="color" style="background: #fff" v-on:click="setPenColor('#fff')"></button>
       <button class="color" style="background: #c0392b" v-on:click="setPenColor('#c0392b')"></button>
@@ -11,6 +12,7 @@
       <button class="circle small"  v-on:click="setPenSize(2)"></button>
       <button class="circle medium" v-on:click="setPenSize(5)" ></button>
       <button class="circle large"  v-on:click="setPenSize(10)"></button>
+      <button class="eraser" v-on:click="enableEraser()"></button>
     </div>
     <ShortcutsView v-bind:visible="helpVisible" />
   </div>
@@ -175,6 +177,7 @@ export default {
       lineWidth: 5,
       laserEnabled: false,
       penEnabled: true,
+      eraserEnabled: false,
       helpVisible: false,
       
       keyBindings: {
@@ -233,6 +236,11 @@ export default {
       }
     },
 
+    enableEraser() {
+      this.eraserEnabled = true;
+      this.penEnabled = false;
+    },
+
     toggleHelpVisible() {
       this.helpVisible = !this.helpVisible;
     },
@@ -241,6 +249,7 @@ export default {
       this.laserEnabled = !this.laserEnabled;
       if (this.laserEnabled) {
         this.penEnabled = false;
+        this.eraserEnabled = false;
       }
     },
 
@@ -248,6 +257,7 @@ export default {
       this.penEnabled = !this.penEnabled;
       if (this.penEnabled) {
         this.laserEnabled = false;
+        this.eraserEnabled = false;
       } else {
         this.drawing = this.erasing = false;
       }
@@ -257,12 +267,14 @@ export default {
       this.strokeStyle = color;
       this.penEnabled = true;
       this.laserEnabled = false;
+      this.eraserEnabled = false;
     },
 
     setPenSize(size) {
       this.lineWidth = size;
       this.penEnabled = true;
       this.laserEnabled = false;
+      this.eraserEnabled = false;
     },
 
     fullScreen() {
@@ -412,8 +424,8 @@ export default {
     },
 
     pointerDown(e) {
+      const point = this.getCanvasPoint(e);
       if (this.penEnabled) {
-        const point = this.getCanvasPoint(e);
         if (e.button == 0) {
           this.drawing = true;
           this.erasing = false;
@@ -425,11 +437,15 @@ export default {
           this.erasing = true;
           this.getPageAnnotations().erase(point, 5);
         }
-      } 
+      } else if (this.eraserEnabled) {
+          this.drawing = false;
+          this.erasing = true;
+          this.getPageAnnotations().erase(point, 5);
+      }
     },
 
     pointerMove(e) {
-      if (this.penEnabled) {
+      if (this.penEnabled || this.eraserEnabled) {
         const point = this.getCanvasPoint(e);
         if (this.drawing) {
           this.getPageAnnotations().update(point);
@@ -438,11 +454,11 @@ export default {
           this.getPageAnnotations().erase(point, 5);
           this.redraw();
         }
-      }
+      } 
     },
 
     pointerUp() {
-      if (this.penEnabled) {
+      if (this.penEnabled || this.eraserEnabled) {
         this.drawing = false;
         this.erasing = false;
         this.redraw();
@@ -540,6 +556,10 @@ canvas {
   cursor: url(/laser-pointer.png), pointer !important; 
 }
 
+.erase {
+  cursor: url(/eraser.png), crosshair !important;
+}
+
 .pen {
   cursor: crosshair;
 }
@@ -593,5 +613,18 @@ button.circle.small {
   width: 10px;
   height: 10px;
   margin: 0px 5px 0px 15px;
+}
+
+button.eraser {
+  display: inline-block;
+  padding: 0;
+  margin: 5px 3px;
+  border: none;
+  width: 20px;
+  height: 20px;
+  background-image: url(/eraser.png);
+  background-size: 20px 20px;
+  background-color:rgba(0, 0, 0, 0);
+  background-position: center;
 }
 </style>
