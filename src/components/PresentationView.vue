@@ -545,7 +545,7 @@ canvas {
 }
 
 div.controls {
-  position: absolute;
+  position: fixed;
   bottom: 10px;
   right: 10px;
   padding: 0px 5px;
