@@ -3,36 +3,36 @@
 
     <table>
       <tr>
-        <td>H</td>
-        <td>Toggle visibility of this help box</td>
-      </tr>
-      <tr>
-        <td>Space / Enter</td>
+        <td>␣ / ⏎</td>
         <td>Next slide</td>
       </tr>
       <tr>
-        <td>Left Arrow / Up Arrow</td>
+        <td>← / ↑</td>
         <td>Previous slide</td>
       </tr>
       <tr>
-        <td>Right Arrow / Down Arrow</td>
+        <td>→ / ↓</td>
         <td>Next slide</td>
       </tr>
       <tr>
         <td>Home</td>
-        <td>First slide</td>
+        <td>Go to first slide</td>
       </tr>
       <tr>
         <td>End</td>
-        <td>Last slide</td>
+        <td>Go to last slide</td>
+      </tr>
+      <tr>
+        <td>B / W</td>
+        <td>Toggle blackboard/whiteboard</td>
       </tr>
       <tr>
         <td>E</td>
         <td>Erase all annotation</td>
       </tr>
       <tr>
-        <td>B</td>
-        <td>Toggle blackboard</td>
+        <td>H</td>
+        <td>Toggle shortcut help box</td>
       </tr>
       <tr>
         <td>L</td>
@@ -47,11 +47,15 @@
         <td>Toggle fullscreen</td>
       </tr>
       <tr>
-        <td>Ctrl-Z</td>
+        <td>T</td>
+        <td>Toggle toolbar</td>
+      </tr>
+      <tr>
+        <td>Ctrl + Z</td>
         <td>Undo last annotation</td>
       </tr>
       <tr>
-        <td>Ctrl-Y</td>
+        <td>Ctrl + Y</td>
         <td>Redo last annotation</td>
       </tr>
     </table>
@@ -76,14 +80,20 @@ export default {
   left: 0;
   /* bottom: 100px; */
   right: 0;
-  width: 500px;
-  padding: 50px;
+  width: 400px;
+  padding: 25px 50px;
   margin: auto;
-  background: rgba(255,255,255,0.95);
-  border: 10px solid darkgray;
+  background: rgb(0,0,0,0.8);
+  border: 10px solid white;
+  color: white;
   display: none;
   visibility: hidden;
   text-align: center;
+}
+
+td:first-child {
+  font-weight: bold;
+  text-align: right;
 }
 
 .visible {
