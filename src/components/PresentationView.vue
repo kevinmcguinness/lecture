@@ -471,7 +471,7 @@ export default {
           var annotation = this.getPageAnnotations().start(point);
           annotation.strokeStyle = this.strokeStyle;
           annotation.lineWidth = this.lineWidth;
-        } else if (e.button == 5) { // surface pro eraser
+        } else if (e.button == 5) { // surface pro eraser in Chrome
           this.drawing = false;
           this.erasing = true;
           this.getPageAnnotations().erase(point, 5);
