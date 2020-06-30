@@ -49,7 +49,7 @@ export default {
     },
 
     openFileDialogChange(ev) {
-      const file = ev.path[0].files[0];
+      const file = ev.target.files[0];
       this.openFile(file);
     },
 
