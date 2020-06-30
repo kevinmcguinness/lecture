@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <PresentationView id="presentation" v-bind:pdf-url="pdfUrl" />
+    <PresentationView id="presentation" v-bind:pdf-url="pdfUrl"  @open-file="showOpenFileDialog" />
   </div>
 </template>
 
@@ -33,6 +33,30 @@ export default {
   methods: {
     setPdfUrl(url) {
       this.pdfUrl = url; 
+    },
+
+    showOpenFileDialog() {
+      var elem = document.createElement("input");
+      elem.setAttribute("type", "file");
+      elem.setAttribute("accept", "application/pdf");
+      elem.addEventListener("change", this.openFileDialogChange, false);
+      var event = new MouseEvent('click', {
+        view: window,
+        bubbles: true,
+        cancelable: true
+      });
+      elem.dispatchEvent(event);
+    },
+
+    openFileDialogChange(ev) {
+      const file = ev.path[0].files[0];
+      this.openFile(file);
+    },
+
+    openFile(file) {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => this.setPdfUrl(reader.result);
     },
 
     dragStart(ev) {

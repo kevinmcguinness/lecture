@@ -214,6 +214,7 @@ export default {
         'KeyP': this.togglePen,
         'KeyZ': {modifiers: ['Ctrl'], callback: this.undoAnnotation},
         'KeyY': {modifiers: ['Ctrl'], callback: this.redoAnnotation},
+        'KeyO': {modifiers: ['Ctrl'], callback: this.showOpenFileDialog},
         'KeyF': this.fullScreen,
         'KeyH': this.toggleHelpVisible,
         'KeyT': this.toggleToolboxVisibility,
@@ -229,6 +230,11 @@ export default {
   },
 
   methods: {
+
+    showOpenFileDialog() {
+      this.$emit('open-file');
+    },
+    
     loadPdf() {
       var loadingTask = pdfjs.getDocument(this.pdfUrl);
       loadingTask.promise.then(this.pdfLoaded, function(reason) {

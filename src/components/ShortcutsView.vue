@@ -58,6 +58,10 @@
         <td>Ctrl + Y</td>
         <td>Redo last annotation</td>
       </tr>
+      <tr>
+        <td>Ctrl + O</td>
+        <td>Show file open dialog</td>
+      </tr>
     </table>
   </div>
 </template>
