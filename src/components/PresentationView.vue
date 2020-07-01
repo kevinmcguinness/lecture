@@ -45,6 +45,7 @@ class Annotation {
     this.points = [point];
     this.path = new Path2D();
     this.path.moveTo(point.x, point.y);
+    this.path.lineTo(point.x, point.y);
     this.strokeStyle = '#c0392b';
     this.lineWidth = 5;
     this.lineCap = 'round';
@@ -56,12 +57,19 @@ class Annotation {
     this.path.lineTo(point.x, point.y);
   }
 
+  end(point) {
+    this.points.push(point);
+    this.path.lineTo(point.x, point.y);
+  }
+
   draw(ctx) {
     ctx.save();
     ctx.strokeStyle = this.strokeStyle;
     ctx.lineWidth = this.lineWidth;
     ctx.lineCap = this.lineCap;
     ctx.lineJoin = this.lineJoin;
+    ctx.shadowBlur = 1;
+    ctx.shadowColor = this.strokeStyle;
     ctx.stroke(this.path);
     ctx.restore();
   }
@@ -99,6 +107,10 @@ class PageAnnotations {
 
   update(point) {
     this.top().lineTo(point);
+  }
+
+  end(point) {
+    this.top().end(point);
   }
 
   undo() {
@@ -502,11 +514,18 @@ export default {
       } 
     },
 
-    pointerUp() {
+    pointerUp(e) {
       if (this.penEnabled || this.eraserEnabled) {
+        const point = this.getCanvasPoint(e);
+        if (this.drawing) {
+          this.getPageAnnotations().end(point);
+          this.redraw();
+        } else if (this.erasing) {
+          this.getPageAnnotations().erase(point, 5);
+          this.redraw();
+        }
         this.drawing = false;
         this.erasing = false;
-        this.redraw();
       } else {
         this.nextPage();
       }
