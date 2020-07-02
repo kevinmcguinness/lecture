@@ -8,17 +8,7 @@
 
 <script>
 
-function localStorageBoolProperty(key, defaultValue) {
-  return {
-    get: function() {
-      var value = window.localStorage.getItem("settings:" + key);
-      return (value === null) ? defaultValue: (value === "true");
-    },
-    set: function(value) {
-      window.localStorage.setItem("settings:" + key, value);
-    }
-  }
-}
+import {localStorageBoolProperty} from "@/lib/helpers";
 
 export default {
   name: 'SettingsView',
