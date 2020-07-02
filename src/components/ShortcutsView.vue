@@ -35,6 +35,10 @@
         <td>Toggle shortcut help box</td>
       </tr>
       <tr>
+        <td>S</td>
+        <td>Show or hide settings</td>
+      </tr>
+      <tr>
         <td>L</td>
         <td>Toggle laser pointer</td>
       </tr>

@@ -27,17 +27,24 @@
       <button class="eraser" title="eraser" v-on:click="enableEraser()"></button>
     </div>
     <ShortcutsView v-bind:visible="helpVisible" />
+    <SettingsView v-bind:visible="settingsVisible" />
     <span id="slide-number" v-bind:class="{hidden: !pageNumberVisible}">{{pageNumber}} / {{pageCount}}</span>
   </div>
 </template>
 
 <script>
 
-
 import pdfjs from 'pdfjs-dist';
 import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.entry';
 import ShortcutsView from './ShortcutsView.vue';
+import SettingsView from './SettingsView.vue';
 pdfjs.GlobalWorkerOptions.workerSrc = pdfjsWorker;
+
+
+function getSetting(key, defaultValue) {
+  var value = window.localStorage.getItem("settings:" + key);
+  return (value === null) ? defaultValue: (value === "true");
+}
 
 
 class Annotation {
@@ -180,7 +187,7 @@ function checkModifiers(event, modifiers) {
 export default {
   name: 'PresentationView',
   components: {
-    ShortcutsView
+    ShortcutsView, SettingsView
   },
   props: {
     pdfUrl: String,
@@ -207,6 +214,7 @@ export default {
       eraserEnabled: false,
       helpVisible: false,
       toolboxVisible: true,
+      settingsVisible: false,
       
       keyBindings: {
         'Space': this.nextPage,
@@ -230,7 +238,8 @@ export default {
         'KeyF': this.fullScreen,
         'KeyH': this.toggleHelpVisible,
         'KeyT': this.toggleToolboxVisibility,
-        'KeyN': this.togglePageNumberVisible
+        'KeyN': this.togglePageNumberVisible,
+        'KeyS': this.toggleSettingsVisible,
       }
     }
   },
@@ -307,6 +316,10 @@ export default {
 
     togglePageNumberVisible() {
       this.pageNumberVisible = !this.pageNumberVisible;
+    },
+
+    toggleSettingsVisible() {
+      this.settingsVisible = !this.settingsVisible;
     },
 
     setPenColor(color) {
@@ -480,9 +493,37 @@ export default {
       }
     },
 
+    shouldBeginAnnotation(e) {
+      if (!this.penEnabled) {
+        return false;
+      }
+
+      var drawWithTouch = getSetting("drawWithTouch", true);
+      var drawWithMouse = getSetting("drawWithMouse", true);
+      var drawWithPen = getSetting("drawWithPen", true);
+
+      // firefox had a bug that turns pen events into touch
+      // see: https://bugzilla.mozilla.org/show_bug.cgi?id=1487509
+      if (navigator.userAgent.toLowerCase().indexOf('firefox') > -1) {
+        drawWithTouch = true;
+      }
+
+      switch(e.pointerType) {
+        case 'pen':
+          return drawWithPen;
+        case 'mouse':
+          return drawWithMouse;
+        case 'touch':
+          return drawWithTouch;
+        default:
+          return false;
+      }
+    },
+
     pointerDown(e) {
+      
       const point = this.getCanvasPoint(e);
-      if (this.penEnabled) {
+      if (this.penEnabled && this.shouldBeginAnnotation(e)) {
         if (e.button == 0) {
           this.drawing = true;
           this.erasing = false;
