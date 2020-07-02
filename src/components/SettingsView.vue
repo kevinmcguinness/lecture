@@ -3,6 +3,7 @@
     <label><input type="checkbox" v-model="drawWithTouch">Enable touch annotation</label>
     <label><input type="checkbox" v-model="drawWithMouse">Enable annotation with a mouse pointer</label>
     <label><input type="checkbox" v-model="drawWithPen">Enable annotation with a pen or stylus</label>
+    <label><input type="checkbox" v-model="smoothLines">Enable smooth annotations</label>
   </div>
 </template>
 
@@ -18,7 +19,8 @@ export default {
   computed: {
     drawWithTouch: localStorageBoolProperty("drawWithTouch", true),
     drawWithMouse: localStorageBoolProperty("drawWithMouse", true),
-    drawWithPen: localStorageBoolProperty("drawWithPen", true)
+    drawWithPen: localStorageBoolProperty("drawWithPen", true),
+    smoothLines: localStorageBoolProperty("smoothLines", true),
   }
 }
 </script>
