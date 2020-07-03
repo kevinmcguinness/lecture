@@ -51,7 +51,7 @@ export default {
   },
   props: {
     pdfUrl: String,
-    scale: {type: Number, default: 3.0},
+    scale: {type: Number, default: null},
     initialPage: {type: Number, default: 1}
   },
   data() {
@@ -260,7 +260,17 @@ export default {
 
     pageLoaded(page) {
       this.page = page;
-      var viewport = page.getViewport({scale: this.scale});
+      
+      var scale = this.scale;
+      if (!scale) {
+        // auto scale
+        var defaultViewport = page.getViewport({scale: 1});
+        scale = Math.max(
+            window.outerHeight/defaultViewport.height, 
+            window.outerWidth/window.innerWidth) + 1;
+      }
+
+      var viewport = page.getViewport({scale: scale});
 
       // Prepare canvas using PDF page dimensions
       this.adjustSize(viewport);
