@@ -1,7 +1,8 @@
 # lecture
 
 Present PDF slideshows using a browser. Supports writing on slides using a pointer
-device (e.g. Surface Pro Pen). Supports Surface Pro Pen eraser (in Chrome).
+device (e.g. Surface Pro Pen). Supports Surface Pro Pen eraser (in Chrome). Live
+version available online at [lecture.onrender.com](https://lecture.onrender.com/).
 
 ## Project setup
 ```
